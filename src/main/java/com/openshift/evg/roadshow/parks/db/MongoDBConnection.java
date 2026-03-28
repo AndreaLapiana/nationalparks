@@ -209,7 +209,7 @@ public class MongoDBConnection {
     /**
      * @return
      */
-    public List<Park> getAll() {
+    /*public List<Park> getAll() {
         System.out.println("[DEBUG] MongoDBConnection.getAll()");
         ArrayList<Park> allParksList = new ArrayList<Park>();
 
@@ -217,6 +217,39 @@ public class MongoDBConnection {
             try {
                 MongoCollection parks = mongoDB.getCollection(COLLECTION);
                 MongoCursor<Document> cursor = parks.find().iterator();
+                try {
+                    while (cursor.hasNext()) {
+                        allParksList.add(ParkReadConverter.convert(cursor.next()));
+                    }
+                } finally {
+                    cursor.close();
+                }
+            } catch (Exception e) {
+                System.out.println("[ERROR] Error connecting to MongoDB. " + e.getMessage());
+            }
+        } else {
+            System.out.println("[ERROR] mongoDB could not be initiallized. No operation with DB will be performed");
+        }
+        return allParksList;
+    }*/
+
+    /**
+     * @return List of parks filtered by country: Italy
+     */
+    public List<Park> getAll() {
+        System.out.println("[DEBUG] MongoDBConnection.getAll() - Filtering for Italy");
+        ArrayList<Park> allParksList = new ArrayList<Park>();
+
+        if (mongoDB != null) {
+            try {
+                MongoCollection<Document> parks = mongoDB.getCollection(COLLECTION);
+                
+                // Create a filter for the country field
+                BasicDBObject query = new BasicDBObject("countryName", "Italy");
+                
+                // Pass the query into the find() method
+                MongoCursor<Document> cursor = parks.find(query).iterator();
+                
                 try {
                     while (cursor.hasNext()) {
                         allParksList.add(ParkReadConverter.convert(cursor.next()));
